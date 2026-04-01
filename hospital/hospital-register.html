@@ -63,6 +63,32 @@ button:hover{
 background:#0369a1;
 }
 
+.login-link {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #64748b;
+}
+.login-link a {
+    color: #0284c7;
+    font-weight: 600;
+    text-decoration: none;
+}
+.login-link a:hover {
+    text-decoration: underline;
+}
+.back-link {
+    margin-top: 30px;
+    display: block;
+    text-align: center;
+    color: #94a3b8;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+.back-link:hover {
+    color: #0f172a;
+}
 </style>
 </head>
 
@@ -88,6 +114,10 @@ background:#0369a1;
 <button onclick="registerHospital()">
 Register Hospital
 </button>
+
+<a href="hospital-login.html" class="back-link">
+    &larr; Back to Login
+</a>
 
 </div>
 
@@ -134,8 +164,11 @@ async function registerHospital(){
         const data = await res.json();
 
         if(res.ok){
-            alert("Hospital Registered Successfully");
-            window.location.href = "hospital-login.html";
+            btn.innerText = "✅ Successfully Registered!";
+            btn.style.background = "#16a34a";
+            setTimeout(() => {
+                window.location.href = "hospital-login.html";
+            }, 800);
         } else {
             alert(data.error || "Registration failed");
             btn.disabled = false;

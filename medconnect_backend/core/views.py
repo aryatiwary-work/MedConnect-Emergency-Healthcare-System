@@ -384,17 +384,24 @@ def get_hospital_sos(request):
 
             if distance <= radius:
 
-                # 🩺 Privacy Protection (HIPAA MASKING)
-                patient_name = sos.user.first_name
                 is_for_self = getattr(sos, 'is_for_self', True)
+                target_condition = sos.emergency_type if is_for_self else getattr(sos, 'third_party_condition', sos.emergency_type)
                 
-                target_condition = sos.emergency_type if is_for_self else sos.third_party_condition
+                # REVEAL DETAILS
+                patient_name = sos.user.first_name if is_for_self else getattr(sos, 'third_party_name', "Unknown Victim")
+                if patient_name == "":
+                    patient_name = sos.user.username if is_for_self else "Unknown Victim"
+                
+                patient_phone = sos.user.contact_number if hasattr(sos.user, 'contact_number') and sos.user.contact_number else "No Phone Provided"
 
                 visible_requests.append({
                     "id": sos.id,
-                    "patient_name": sos.user.first_name if is_for_self else sos.third_party_name,
-                    "patient_phone": sos.user.contact_number if is_for_self else sos.third_party_phone,
+                    "patient_name": patient_name,
+                    "patient_phone": patient_phone,
                     "emergency": target_condition or sos.emergency_type,
+                    "medical_condition": sos.user.medical_condition if is_for_self else getattr(sos, 'third_party_condition', 'Unknown'),
+                    "allergies": sos.user.allergies if is_for_self else "Unknown",
+                    "blood_group": sos.user.blood_group if is_for_self else "Unknown",
                     "is_for_self": is_for_self,
                     "caller_name": sos.user.first_name if not is_for_self else None,
                     "lat": sos.latitude,

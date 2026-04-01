@@ -2,10 +2,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Hospital Portal Dashboard | MedConnect</title>
+<title>Hospital Command Center | MedConnect</title>
 
 <!-- GOOGLE FONTS -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- LEAFLET MAPS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -13,184 +13,440 @@
 
 <style>
 
-body{
-margin:0;
-font-family:'Inter',sans-serif;
-background:#f8fafc;
-color:#334155;
-min-height: 100vh;
+:root {
+    --primary: #0284c7;
+    --primary-dark: #0369a1;
+    --primary-light: #e0f2fe;
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --success: #10b981;
+    --bg-dark: #0f172a;
+    --bg-light: #f4f7fb;
+    --text-main: #334155;
+    --text-soft: #64748b;
+    --glass: #ffffff;
 }
 
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-light);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ================== PREMIUM NAVBAR ================== */
 .nav {
     background: #ffffff;
-    border-bottom: 1px solid #e2e8f0;
-    color: #0f172a;
-    padding: 15px 40px;
+    border-bottom: 1px solid #eef2f6;
+    padding: 20px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 1100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
 
-.nav-brand-box {
+.nav-brand-box a {
     display: flex;
     align-items: center;
     gap: 15px;
+    text-decoration: none;
 }
 
 .nav-brand-box img {
-    height: 70px;
+    height: 45px;
     width: auto;
+    object-fit: contain;
 }
 
 .nav-title {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--bg-dark);
+    letter-spacing: -0.5px;
 }
 
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.status-badge {
+    background: #ffffff;
+    color: var(--success);
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #d1fae5;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+    letter-spacing: 0.5px;
+}
+
+.status-badge .dot {
+    width: 10px;
+    height: 10px;
+    background: var(--success);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--success);
+}
+
+.btn-logout {
+    text-decoration: none;
+    color: var(--text-soft);
+    font-weight: 600;
+    font-size: 15px;
+    background: #f8fafc;
+    padding: 10px 20px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+    background: #fee2e2;
+    color: var(--danger-dark);
+}
+
+/* ================== MAIN LAYOUT ================== */
 .dashboard-wrapper {
-display: flex;
-min-height: calc(100vh - 101px);
+    display: flex;
+    flex: 1;
+    overflow: hidden;
 }
 
+/* SIDEBAR RE-DESIGN */
 .sidebar {
-width: 380px;
-background: #ffffff;
-border-right: 1px solid #e2e8f0;
-padding: 30px 20px;
-display: flex;
-flex-direction: column;
+    width: 420px;
+    background: #ffffff;
+    border-right: 1px solid #eef2f6;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.02);
 }
 
-.main-content {
-flex: 1;
-padding: 40px;
-background: #f8fafc;
+/* CAPACITY WIDGET */
+.capacity-widget {
+    padding: 30px;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    margin: 24px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px -5px rgba(0,0,0,0.04);
+}
+
+.capacity-widget h3 {
+    font-size: 14px;
+    color: var(--text-soft);
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cap-grid {
+    display: flex;
+    justify-content: space-between;
+}
+
+.cap-item {
+    text-align: center;
+    background: #ffffff;
+    padding: 15px 25px;
+    border-radius: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    flex: 1;
+    margin: 0 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.cap-item:first-child { margin-left: 0; }
+.cap-item:last-child { margin-right: 0; }
+
+.cap-val {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--bg-dark);
+    line-height: 1;
+}
+
+.cap-label {
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-top: 6px;
+    font-weight: 600;
 }
 
 .radar-header {
-    font-size: 18px;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0 0 20px 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--bg-dark);
+    margin: 10px 24px 20px 24px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #f1f5f9;
+    border-bottom: 2px solid var(--primary-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.sos-card{
-background: #ffffff;
-border: 1px solid #e2e8f0;
-padding: 20px;
-border-radius: 12px;
-margin-bottom: 15px;
-transition: all 0.2s;
+.radar-header span {
+    background: var(--danger);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.3);
+}
+
+.sos-list-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 24px 24px;
+}
+
+.sos-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px -5px rgba(0,0,0,0.04);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.sos-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px -5px rgba(0,0,0,0.08);
+    border-color: #cbd5e1;
+}
+
+.sos-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: var(--danger);
+    width: 6px;
+    height: 100%;
+    border-radius: 6px 0 0 6px;
 }
 
 .sos-card .label {
-color: #64748b;
-font-weight: 600;
-font-size: 12px;
-text-transform: uppercase;
-margin-bottom: 4px;
+    color: var(--text-soft);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
 }
 
 .sos-card .value {
-color: #0f172a;
-font-size: 15px;
-font-weight: 700;
-margin-bottom: 10px;
+    color: var(--bg-dark);
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 16px;
+}
+
+.sos-metric {
+    display: flex;
+    justify-content: space-between;
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-top: 20px;
+    border: 1px solid #eef2f6;
+}
+
+.sos-metric span {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
 }
 
 .btn-accept {
-width: 100%;
-padding: 14px;
-border:none;
-background:#dc2626;
-color:white;
-border-radius:10px;
-cursor:pointer;
-font-weight: 700;
-font-size: 15px;
-transition: opacity 0.2s;
-margin-top: 10px;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.25);
+    transition: all 0.2s;
+    margin-top: 20px;
 }
 
 .btn-accept:hover {
-background:#b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(220, 38, 38, 0.35);
 }
 
-/* Stats Overlay */
-.stats-overlay {
-position: absolute;
-top: 20px;
-right: 20px;
-z-index: 1000;
-display: flex;
-gap: 15px;
+/* ================== MAP & DIAGNOSTIC AREA ================== */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    background: var(--bg-light);
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
-.stat-box {
-background: #ffffff;
-border: 1px solid #e2e8f0;
-box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-padding: 15px 20px;
-border-radius: 12px;
-min-width: 120px;
-text-align: center;
+
+#dispatchMap {
+    flex: 1;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
 }
-/* Clinical Dashboard Panels */
+
+/* DIAGNOSTIC VIEW OVERHAUL */
+#diagnosticView {
+    display: none;
+    height: 100%;
+    flex-direction: column;
+}
+
+.diag-header {
+    background: #ffffff;
+    padding: 35px 40px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 8px 25px -5px rgba(0,0,0,0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.diag-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--bg-dark);
+    margin: 0 0 10px 0;
+    letter-spacing: -0.5px;
+}
+
+.diag-header p {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text-soft);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.diag-header p span {
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.btn-resolve {
+    padding: 16px 32px;
+    background: #f8fafc;
+    color: var(--text-main);
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+.btn-resolve:hover {
+    background: #e2e8f0;
+    color: var(--bg-dark);
+    transform: translateY(-2px);
+}
+
 .case-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 30px;
+    margin-bottom: 30px;
+    flex: 1;
 }
 
 .clinical-panel {
     background: #ffffff;
-    padding: 30px;
-    border-radius: 16px;
+    padding: 35px;
+    border-radius: 20px;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    box-shadow: 0 8px 25px -5px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
 }
 
 .clinical-panel h2 {
-    margin: 0 0 20px 0;
-    font-size: 18px;
-    color: #475569;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 2px solid #f8fafc;
-    padding-bottom: 10px;
+    margin: 0 0 25px 0;
+    font-size: 20px;
+    color: var(--bg-dark);
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+}
+
+.clinical-panel h2::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 24px;
+    background: var(--primary);
+    border-radius: 4px;
+    margin-right: 12px;
 }
 
 .clinical-row {
     display: flex;
     justify-content: space-between;
-    padding: 14px 0;
-    border-bottom: 1px solid #f1f5f9;
+    align-items: center;
+    padding: 18px 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #eef2f6;
 }
 
 .clinical-row:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 18px;
 }
 
 .clinical-row span {
-    color: #64748b;
-    font-weight: 500;
+    color: var(--text-soft);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .clinical-row strong {
-    color: #0f172a;
+    color: var(--bg-dark);
+    font-weight: 800;
+    font-size: 16px;
 }
 
 #map-view {
-    height: 350px;
+    flex: 1;
     width: 100%;
-    background: #f1f5f9;
-    border-radius: 12px;
-    margin-top: 20px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    margin-top: 25px;
+    z-index: 1;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
 }
 
 </style>
@@ -200,105 +456,120 @@ text-align: center;
 
 <div class="nav">
     <div class="nav-brand-box">
-        <img src="../images/medconnect-logo.png" alt="MedConnect">
-        <div class="nav-title" id="hospitalNav">Hospital Command Center</div>
+        <a href="../index.html">
+            <img src="../images/medconnect-logo.png" alt="MedConnect">
+            <div class="nav-title" id="hospitalNav">Hospital Command Center</div>
+        </a>
     </div>
-    <div id="radarSync" style="font-size:12px; color:#16a34a; font-weight:800; display:flex; align-items:center; gap:8px;">
-        <span style="width:8px; height:8px; background:#16a34a; border-radius:50%; display:inline-block;"></span>
-        RADAR ONLINE
+    <div class="nav-right">
+        <div class="status-badge">
+            <div class="dot"></div>
+            RADAR ACTIVE
+        </div>
+        <a href="../index.html" class="btn-logout">Exit Portal</a>
     </div>
 </div>
 
 <div class="dashboard-wrapper">
     
     <div class="sidebar">
-        <h2 class="radar-header">Live Emergency Radar</h2>
-        
-        <div id="sosList"></div>
+        <!-- Live Hospital Capacity View -->
+        <div class="capacity-widget">
+            <h3>Facility Capacity Status</h3>
+            <div class="cap-grid">
+                <div class="cap-item">
+                    <div class="cap-val" id="dispTotalBeds">--</div>
+                    <div class="cap-label">Total Beds</div>
+                </div>
+                <div class="cap-item">
+                    <div class="cap-val" id="dispIcuBeds" style="color: var(--danger);">--</div>
+                    <div class="cap-label">ICU Output</div>
+                </div>
+            </div>
+        </div>
 
-        <div class="dispatch-history">
-            <h3 style="font-size:14px; color:#64748b; margin-bottom:15px;">Today's Dispatches</h3>
-            <div id="historyList"></div>
+        <h2 class="radar-header">
+            Active Radar Requests
+            <span id="sosCount">0</span>
+        </h2>
+        
+        <div class="sos-list-container" id="sosList">
+            <!-- SOS Cards Injected Here -->
         </div>
     </div>
 
     <div class="main-content">
         <!-- MODE 1: SCANNING (RADAR MAP) -->
-        <div id="radarView" style="height: 100%;">
-            <div id="dispatchMap" style="height: 100%; border-radius: 16px; border: 1px solid #e2e8f0;"></div>
+        <div id="radarView" style="display: flex; height: 100%;">
+            <div id="dispatchMap"></div>
         </div>
 
-        <!-- MODE 2: DIAGNOSTIC (ACTIVE CASE) -->
-        <div id="diagnosticView" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+        <div id="diagnosticView">
+            <div class="diag-header">
                 <div>
-                    <h1 id="activePatientName" style="margin:0; font-size:32px; font-weight:800; color:#0f172a;">-</h1>
-                    <p style="margin:5px 0 0 0; color:#64748b; font-weight:600;">DISPATCH ACTIVE • AMBULANCE EN ROUTE</p>
+                    <h1 id="activePatientName">Patient Name</h1>
+                    <p>DISPATCH ACTIVE • AMBULANCE EN ROUTE • ID <span id="traceId"></span></p>
                 </div>
-                <button onclick="resolveSOS()" style="padding:12px 24px; background:#16a34a; color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
-                    RESOLVE EMERGENCY
-                </button>
+                <button class="btn-resolve" onclick="resolveSOS()">✅ Mark as Completed</button>
             </div>
 
             <div class="case-grid">
                 <div class="clinical-panel">
-                    <h2>Patient Clinical Profile</h2>
+                    <h2>Primary Clinical Record</h2>
                     <div class="clinical-row"><span>Patient Age</span> <strong id="pAge">-</strong></div>
                     <div class="clinical-row"><span>Blood Group</span> <strong id="pBlood">-</strong></div>
-                    <div class="clinical-row"><span>Institutional Contact</span> <strong id="pPhone">-</strong></div>
+                    <div class="clinical-row"><span>Secured Contact</span> <strong id="pPhone">-</strong></div>
                     <div class="clinical-row"><span>Emergency Contact</span> <strong id="pEContact">-</strong></div>
                 </div>
 
                 <div class="clinical-panel">
-                    <h2>EHR & Medical History</h2>
+                    <h2>Live Victim Tracking</h2>
                     <div class="clinical-row"><span>Known Conditions</span> <strong id="pCondition">-</strong></div>
-                    <div class="clinical-row"><span>Allergies</span> <strong id="pAllergies" style="color:#dc2626;">-</strong></div>
-                    <div class="clinical-row"><span>Emergency Nature</span> <strong id="pEmergency" style="color:#ef4444;">-</strong></div>
+                    <div class="clinical-row"><span>Active Allergies</span> <strong id="pAllergies" style="color:#ef4444;">-</strong></div>
+                    <div class="clinical-row"><span>Emergency Vector</span> <strong id="pEmergency" style="color:#1e293b; background: #fef2f2; padding: 2px 8px; border-radius: 8px;">-</strong></div>
+                    <div id="map-view"></div>
                 </div>
             </div>
 
-            <div id="map-view"></div>
         </div>
     </div>
-
 </div>
 
 <script src="../js/api-config.js"></script>
 <script>
-
 let lastSOSDataStr = "";
 let dispatchMap = null;
 let markersLayer = null;
 
+function renderCapacity() {
+    const total = sessionStorage.getItem("total_beds") || '250';
+    const icu = sessionStorage.getItem("icu_beds") || '20';
+    document.getElementById("dispTotalBeds").innerText = total;
+    document.getElementById("dispIcuBeds").innerText = icu;
+}
+
 // 🔥 INIT LEAFLET MAP
 function initMap() {
-    dispatchMap = L.map('dispatchMap').setView([40.7128, -74.0060], 12);
-    // Light Map Tile Layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: 'Map data &copy; OpenStreetMap'
+    dispatchMap = L.map('dispatchMap').setView([28.6139, 77.2090], 11);
+    // Medical Themed Light Map
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: 'Map &copy; OpenStreetMap'
     }).addTo(dispatchMap);
-    
     markersLayer = L.layerGroup().addTo(dispatchMap);
+    renderCapacity();
 }
 
 // 🔥 LOAD SOS FROM BACKEND
 async function loadSOS(){
-
     const hospital_id = sessionStorage.getItem("hospital_id");
     const hospital_name = sessionStorage.getItem("hospital_name");
 
-    if(hospital_name) {
-        document.getElementById("hospitalNav").innerText = hospital_name + " Dispatch Center";
-    }
-
+    if (hospital_name) document.getElementById("hospitalNav").innerText = hospital_name;
     const container = document.getElementById("sosList");
-
-    if(!hospital_id){
-        return;
-    }
+    if(!hospital_id) return;
+    if(window.activeCaseId) return; // Prevent overwriting panel if case is locked
 
     try {
-
         const res = await medconnectFetch("/hospital/sos/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -308,20 +579,18 @@ async function loadSOS(){
         const data = await res.json();
         const dataStr = JSON.stringify(data);
 
-        // 🚫 NO FLICKER: Skip DOM rebuild if data hasn't changed
-        if(dataStr === lastSOSDataStr){
-            return;
-        }
+        if(dataStr === lastSOSDataStr) return;
         lastSOSDataStr = dataStr;
 
-        // 🧹 CLEAR PREVIOUS STATE
         container.innerHTML = "";
         markersLayer.clearLayers();
+        document.getElementById("sosCount").innerText = data ? data.length : 0;
 
         if(!data || data.length === 0){
             container.innerHTML = `
-                <div style="padding:40px 20px; text-align:center; color:#64748b; font-weight:600;">
-                    📡 Sector clear. <br>Scanning for SOS beacons...
+                <div style="padding:50px 20px; text-align:center; color:#94a3b8; font-weight:600;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🛡️</div>
+                    Sector clear.<br>All vitals stable.
                 </div>
             `;
             return;
@@ -331,105 +600,128 @@ async function loadSOS(){
             const card = document.createElement("div");
             card.className = "sos-card";
 
+            const conditionText = sos.medical_condition && sos.medical_condition.trim() !== "" ? sos.medical_condition : "None declared";
+            const allergyText = sos.allergies && sos.allergies.trim() !== "" ? sos.allergies : "None reported";
+
             card.innerHTML = `
-                <div class="label">Patient Name</div>
-                <div class="value">${sos.patient_name}</div>
+                <div class="label">Patient Profile</div>
+                <div class="value">${sos.patient_name} <span style="font-size:12px; background:#e2e8f0; padding:2px 6px; border-radius:4px; margin-left:6px;">${sos.blood_group || "Blood ???"}</span></div>
                 
-                <div class="label">Primary Contact</div>
+                <div class="label">Primary Identifier</div>
                 <div class="value">${sos.patient_phone}</div>
 
-                <div class="label">Emergency Details</div>
-                <div class="value" style="color:#dc2626;">${sos.emergency}</div>
+                <div class="label" style="color:var(--danger)">Active Emergency</div>
+                <div class="value" style="color:var(--danger);">${sos.emergency}</div>
 
-                <div style="display:flex; justify-content:space-between; margin-top:15px;">
-                    <span style="font-size:12px; font-weight:600; color:#64748b;">📍 ${sos.distance} KM</span>
-                    <span style="font-size:12px; font-weight:600; color:#64748b;">⏳ ${sos.time}s AGO</span>
+                <div class="label" style="color:#0f172a; margin-top: 10px;">Known Conditions</div>
+                <div class="value" style="color:#0f172a; font-size: 14px;">${conditionText}</div>
+
+                <div class="label" style="color:#ea580c; margin-top: 8px;">Allergies</div>
+                <div class="value" style="color:#ea580c; font-size: 14px;">${allergyText}</div>
+
+                <div class="sos-metric">
+                    <span>📍 ${parseFloat(sos.distance).toFixed(1)} KM Radius</span>
+                    <span>⏳ ${sos.time}s Elapsed</span>
                 </div>
 
                 <button class="btn-accept" onclick="acceptSOS(${sos.id}, ${sos.lat}, ${sos.lng})">
-                    DISPATCH AMBULANCE
+                    AUTHORIZE DISPATCH
                 </button>
             `;
 
             container.appendChild(card);
 
-            // 🗺️ PLOT ON LEAFLET MAP
             const marker = L.circleMarker([sos.lat, sos.lng], {
-                radius: 10,
-                fillColor: "#ef4444",
-                color: "#fca5a5",
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.8
+                radius: 12, fillColor: "#ef4444", color: "#ffffff", weight: 3, opacity: 1, fillOpacity: 0.9
             }).addTo(markersLayer);
             
-            marker.bindPopup(`<b style="color:black;">${sos.patient_name}</b><br>${sos.emergency}`);
+            marker.bindPopup(`<b style="font-size:14px;">Incoming Emergency</b><br><span style="color:#ef4444; font-weight:700;">${sos.emergency}</span>`);
         });
         
-        // Auto-center on nearest SOS
-        if(data.length > 0) {
-            dispatchMap.setView([data[0].lat, data[0].lng], 13);
-        }
+        if(data.length > 0) dispatchMap.setView([data[0].lat, data[0].lng], 13);
 
     } catch (error) {
-        console.error("Error loading SOS:", error);
-        container.innerHTML = `<div style="color:#ef4444;">Server error locking radar.</div>`;
+        console.error(error);
     }
 }
 
-
-// 🔥 OVERHAULED ACCEPT SOS
+// 🔥 ACCEPT & SWITCH TO CLINICAL DIAGNOSTIC MODE
 async function acceptSOS(request_id, lat, lng){
-
     const hospital_id = sessionStorage.getItem("hospital_id");
 
     try {
         const res = await medconnectFetch(`/hospital/accept/${request_id}/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+            method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ hospital_id: hospital_id })
         });
-
-        const data = await res.json();
-
-        if(res.ok){
-            if(window.sosInterval) clearInterval(window.sosInterval);
-
-            // 1. SWITCH UI MODE
-            document.getElementById("radarView").style.display = "none";
-            document.getElementById("diagnosticView").style.display = "block";
-            document.getElementById("sosList").innerHTML = `
-                <div style="background:#f0fdf4; color:#16a34a; padding:15px; border-radius:10px; font-weight:700; text-align:center;">
-                    🚑 AMBULANCE EN ROUTE
-                </div>
-            `;
-
-            // 2. HYDRATE CLINICAL DATA (REAL-TIME TRANSFER)
-            const clinicalRes = await medconnectFetch(`/sos/details/${request_id}/`);
-            const clinical = await clinicalRes.json();
-
-            document.getElementById("activePatientName").innerText = clinical.name;
-            document.getElementById("pAge").innerText = clinical.age || "N/A";
-            document.getElementById("pBlood").innerText = clinical.blood_group || "N/A";
-            document.getElementById("pPhone").innerText = clinical.phone || "N/A";
-            document.getElementById("pEContact").innerText = clinical.emergency_contact || "N/A";
-            document.getElementById("pCondition").innerText = clinical.medical_condition || "None Reported";
-            document.getElementById("pAllergies").innerText = clinical.allergies || "None";
-            document.getElementById("pEmergency").innerText = clinical.emergency_type;
-
-            // 3. MAP TRACING
-            const diagMap = L.map('map-view').setView([lat, lng], 14);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(diagMap);
-            L.marker([lat, lng]).addTo(diagMap).bindPopup("<b>Victim Real-Time Location</b>").openPopup();
-
-            // Store ID for resolve
-            window.activeCaseId = request_id;
-
-        } else {
-            alert(data.error);
+        
+        if (!res.ok) {
+            const errData = await res.json();
+            alert(errData.message || errData.error || "Failed. Patient already assigned.");
+            return;
         }
+
+        window.activeCaseId = request_id; // FIX PRE-EMPTIVE RACE COND
+
+        if(window.sosInterval) clearInterval(window.sosInterval);
+
+        // UI SWAP
+        document.getElementById("radarView").style.display = "none";
+        document.getElementById("diagnosticView").style.display = "flex";
+        
+        document.getElementById("sosList").innerHTML = `
+            <div style="background:#f0fdf4; color:#059669; padding:20px; border-radius:16px; font-weight:700; text-align:center; border: 1px solid #a7f3d0; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.1);">
+                <div style="font-size: 30px; margin-bottom: 10px;">🚑</div>
+                AMBULANCE DEPLOYED <br><span style="font-size: 13px; font-weight: 500; color: #10b981;">Telemetry Locked</span>
+            </div>
+        `;
+
+        // LOAD SECURE EHR
+        const clinicalRes = await medconnectFetch(`/hospital/sos/${request_id}/`);
+        const clinical = await clinicalRes.json();
+
+        document.getElementById("activePatientName").innerText = clinical.name;
+        document.getElementById("traceId").innerText = "#" + request_id + "-" + Math.floor(Math.random()*1000);
+        document.getElementById("pAge").innerText = clinical.age || "Classified";
+        document.getElementById("pBlood").innerText = clinical.blood_group || "Unknown";
+        document.getElementById("pPhone").innerText = clinical.phone || "Unknown";
+        document.getElementById("pEContact").innerText = clinical.emergency_contact || "Unavailable";
+        document.getElementById("pCondition").innerText = clinical.medical_condition || "None Reported";
+        document.getElementById("pAllergies").innerText = clinical.allergies || "None";
+        document.getElementById("pEmergency").innerText = clinical.emergency_type;
+
+        // MAP TRACKER
+        try {
+            if(window.diagMap) window.diagMap.remove();
+            window.diagMap = L.map('map-view').setView([lat, lng], 15);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(window.diagMap);
+            
+            const pulseIcon = L.divIcon({
+                className: 'css-icon',
+                html: '<div style="background-color:#ef4444; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow: 0 0 0 5px rgba(239,68,68,0.3);"></div>',
+                iconSize: [20,20]
+            });
+            L.marker([lat, lng], {icon: pulseIcon}).addTo(window.diagMap).bindPopup("<b>Victim Zero</b>").openPopup();
+            setTimeout(() => { window.diagMap.invalidateSize(); }, 500);
+        } catch(mapErr) {
+            console.error("Map failed to load:", mapErr);
+        }
+
+        // FORCE ALERT AS REQUESTED BY USER FOR FALLBACK CONSISTENCY
+        alert(
+            `🚨 PATIENT DETAILS - DISPATCH SECURED 🚨\n\n` +
+            `Patient Name: ${clinical.name || "Unknown"}\n` +
+            `Age: ${clinical.age || "Classified"}\n` +
+            `Blood Group: ${clinical.blood_group || "Unknown"}\n` +
+            `Medical Condition: ${clinical.medical_condition || "None"}\n` +
+            `Allergies: ${clinical.allergies || "None"}\n` +
+            `Emergency Contact: ${clinical.emergency_contact || "Unavailable"}\n\n` +
+            `Please prepare the facility for arrival.`
+        );
+
     } catch (error){
-        console.error(error);
+        console.error("Critical Error loading patient view:", error);
+        alert("CRITICAL ERROR: Failed to fetch patient details. See console.");
     }
 }
 
@@ -437,22 +729,18 @@ async function resolveSOS(){
     if(!window.activeCaseId) return;
     try {
         await medconnectFetch(`/sos/resolve/${window.activeCaseId}/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user_id: localStorage.getItem("user_id") || 1 }) // Dummy user id just to fulfill API requirement
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: 1 })
         });
         location.reload();
-    } catch(e){ alert("Resolve failed"); }
+    } catch(e){ alert("Resolution verification failed"); }
 }
 
-// Boot Sequence
 initMap();
 loadSOS();
-
-// 🔥 SILENT RADIUS POLLING (No flicker)
 window.sosInterval = setInterval(loadSOS, 5000);
 
-// 🚀 REAL-TIME WEBSOCKETS (Zero-latency Sync)
+// WEBSOCKETS RE-ARMED
 const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
 const wsUrl = `${wsProtocol}://127.0.0.1:8001/ws/emergency/`;
 const emergencySocket = new WebSocket(wsUrl);
@@ -460,30 +748,15 @@ const emergencySocket = new WebSocket(wsUrl);
 emergencySocket.onmessage = function(e) {
     const payload = JSON.parse(e.data);
     if(payload.action === "NEW_SOS"){
-        // 🎙️ HTML5 Voice Announcer
         if ('speechSynthesis' in window) {
-            const msg = new SpeechSynthesisUtterance("Flash Override: New emergency detected in sector.");
-            msg.rate = 1.1; msg.pitch = 0.9;
-            window.speechSynthesis.speak(msg);
+            const msg = new SpeechSynthesisUtterance("Code Blue. New emergency broadcast received.");
+            msg.rate = 1.1; window.speechSynthesis.speak(msg);
         }
     }
-    
     if(payload.action === "NEW_SOS" || payload.action === "SOS_ASSIGNED"){
-        setTimeout(() => {
-            loadSOS();
-        }, 300);
+        setTimeout(loadSOS, 300);
     }
 };
-
-emergencySocket.onopen = function(e) {
-    console.log("🟢 WebSockets Connected - Real-Time Sync Active");
-};
-
-emergencySocket.onclose = function(e) {
-    console.error("🔴 WebSockets Disconnected");
-};
-
 </script>
-
 </body>
 </html>

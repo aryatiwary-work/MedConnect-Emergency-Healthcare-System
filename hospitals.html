@@ -26,6 +26,7 @@ body {
 
 /* ================= 100px PREMIUM NAVBAR ================= */
 .navbar {
+    box-sizing: border-box;
     width: 100%;
     background: #ffffff;
     border-bottom: 1px solid #e2e8f0;
@@ -109,11 +110,27 @@ body {
 
 .card {
     background: white;
-    padding: 30px;
     border-radius: 20px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 10px 25px rgba(0,0,0,0.03);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.card-body {
+    padding: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .card:hover {
@@ -226,16 +243,22 @@ async function loadHospitals(){
 
             container.innerHTML += `
             <div class="card">
-                <div class="status ${statusClass}">${statusText}</div>
-                <h2>${h.name}</h2>
-                <p>
-                    <strong>Facility:</strong> ${h.city}<br>
-                    <strong>Capacity:</strong> ${h.total_beds} Total Beds<br>
-                    <strong>Critical:</strong> ${h.icu_beds} ICU Units Available
-                </p>
-                <div class="card-actions">
-                    <a href="tel:${h.phone || ''}" class="btn btn-call">Direct Dispatch</a>
-                    <a href="#" class="btn btn-map">View Map</a>
+                <img src="images/modern_hospital.png" alt="Hospital Photo" class="card-img">
+                <div class="card-body">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div class="status ${statusClass}">${statusText}</div>
+                        <span style="font-size:12px; font-weight:700; color:var(--primary);">${h.distance || '0'} KM AWAY</span>
+                    </div>
+                    <h2>${h.name}</h2>
+                    <p style="flex:1;">
+                        <strong>Facility:</strong> ${h.city}<br>
+                        <strong>Capacity:</strong> ${h.total_beds} Total Beds<br>
+                        <strong>Critical:</strong> ${h.icu_beds} ICU Units Available
+                    </p>
+                    <div class="card-actions">
+                        <a href="tel:${h.phone || ''}" class="btn btn-call">Direct Dispatch</a>
+                        <a href="#" class="btn btn-map">View Map</a>
+                    </div>
                 </div>
             </div>`;
         });

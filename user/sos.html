@@ -265,8 +265,8 @@ h1 {
 
         <!-- SELF OPTIONS -->
         <div id="selfOptions" class="options" style="text-align: left;">
-            <button class="option-btn" onclick="selectEmergency('Medical Emergency')" style="background:var(--primary);">Use Registered Medical Profile</button>
-            <button class="option-btn" onclick="showOther()" style="background:var(--slate-600);">Other (Custom Case)</button>
+            <button id="btnRegisteredProfile" class="option-btn" onclick="selectEmergency('Medical Emergency')" style="background:var(--primary);">Use Registered Medical Profile</button>
+            <button id="btnOther" class="option-btn" onclick="showOther()" style="background:var(--slate-600);">Other (Custom Case)</button>
             <input id="otherInput" class="input-text" placeholder="Describe emergency (e.g. Broken Limb)" style="display:none; margin-top:10px;">
             <button class="option-btn btn-dispatch" onclick="startSOS(true)">🚨 Dispatch Ambulance</button>
         </div>
@@ -296,7 +296,19 @@ let polling = null;
 function showOptions(){
     document.getElementById("sosBtn").style.display = "none";
     document.querySelector(".desc").style.display = "none";
-    document.getElementById("options").style.display = "block";
+    
+    // Check if anonymous
+    const uid = localStorage.getItem("user_id");
+    if (!uid) {
+        document.getElementById("selfOptions").style.display = "block";
+        document.getElementById("btnRegisteredProfile").style.display = "none";
+        document.getElementById("btnOther").style.display = "none";
+        document.getElementById("otherInput").style.display = "block";
+        document.getElementById("otherInput").placeholder = "Describe emergency (e.g. Car Accident, Chest Pain)";
+        selectedEmergency = "";
+    } else {
+        document.getElementById("options").style.display = "block";
+    }
 }
 
 function showSelfOptions(){
@@ -336,8 +348,10 @@ async function startSOS(isSelf){
         return;
     }
 
-    const user_id = localStorage.getItem("user_id");
-    if(!user_id){ alert("Clinical authorization required. Please login."); return; }
+    let user_id = localStorage.getItem("user_id");
+    if(!user_id){
+        user_id = "ANONYMOUS_" + Math.floor(Math.random() * 999999);
+    }
 
     document.getElementById(isSelf ? "selfOptions" : "thirdPartyForm").style.display = "none";
     status.innerHTML = "📡 Synchronizing Location...";
@@ -368,23 +382,45 @@ async function startSOS(isSelf){
     }, () => { alert("Location access required for emergency dispatch."); });
 }
 
-function startPolling(user_id){
+function startPolling(user_id) {
     const status = document.getElementById("statusText");
-    if(polling) clearInterval(polling);
+    
+    // 🚀 REAL-TIME WEBSOCKETS (Zero-latency Sync)
+    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsUrl = `${wsProtocol}://127.0.0.1:8001/ws/emergency/`;
+    const emergencySocket = new WebSocket(wsUrl);
 
+    emergencySocket.onmessage = async function(e) {
+        const payload = JSON.parse(e.data);
+        if(payload.action === "SOS_ASSIGNED" || payload.action === "NEW_SOS"){
+            // Immediate hydrate
+            try {
+                const res = await medconnectFetch(`/status/${user_id}/`);
+                const data = await res.json();
+                if(data.status === "ASSIGNED") {
+                    if(polling) clearInterval(polling);
+                    renderAssignedScreen(data);
+                }
+            } catch(err) {}
+        }
+    };
+    
+    emergencySocket.onopen = function() {
+        console.log("🟢 Patient SOS WebSockets Connected");
+        status.innerHTML = "🔍 Radar Online: Broadcasting to Dispatch...";
+    };
+
+    if(polling) clearInterval(polling);
     polling = setInterval(async ()=>{
         try {
             const res = await medconnectFetch(`/status/${user_id}/`);
             const data = await res.json();
-
             if(data.status === "ASSIGNED"){
                 clearInterval(polling);
                 renderAssignedScreen(data);
-            } else {
-                status.innerHTML = "🔍 Coordinating with Facility Command...";
             }
         } catch(err) { console.error(err); }
-    }, 2000);
+    }, 5000); // reduced aggressiveness due to WebSockets
 }
 
 function renderAssignedScreen(data){
